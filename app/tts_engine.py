@@ -61,5 +61,5 @@ if __name__ == "__main__":
         text = input("Your text : ")
         #if contains_romaji(text) : continue
 
-        generate_voice(text)
+        generate_voice(text, "resources/output.wav")
         play_voice(output_path)
