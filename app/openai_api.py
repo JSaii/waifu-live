@@ -22,14 +22,14 @@ def image_to_data_uri(image_path: str) -> str:
 def get_user_input():
     return input(f"You: ")
 
-def build_message(text="...", role='user', image_url=None):
-    if not image_url:
+def build_message(text="...", role='user', image_path=None):
+    if not image_path:
         return {"role":role, "content":text}
     else:
         return {
             "role":role, 
             "content":[{"type":"text", "text":text},
-                       {"type":"image_url", "image_url":{"url":image_to_data_uri(image_url)}}]
+                       {"type":"image_url", "image_url":{"url":image_to_data_uri(image_path)}}]
             }
 
 def get_response(messages):
@@ -48,7 +48,7 @@ if __name__ == "__main__":
             "content":"You are a helpful assistant."
         }
     ]
-    message_img = build_message(text="What is this image?", image_url="resources\image.jpg")
+    message_img = build_message(text="What is this image?", image_path="resources\image.jpg")
     messages.append(message_img)
     response = get_response(messages)
     print(response)
