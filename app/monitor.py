@@ -1,6 +1,7 @@
 import pyautogui
 import openai_api
 import tts_engine
+import utils
 
 def captureScreen(path):
     screenshot = pyautogui.screenshot()
@@ -36,9 +37,8 @@ while True:
 
     messages.append(response_message)
 
-    print(response)
+    print(f"Response: {response}")
 
+    response = utils.convert_to_hiragana(response)
     tts_engine.generate_voice(response, voice_output_path)
     tts_engine.play_voice(voice_output_path)
-
-    print(messages)
