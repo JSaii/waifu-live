@@ -46,8 +46,10 @@ def generate_voice(text: str, voice_output_path: str):
         gen_text=text,
         file_wave=voice_output_path,
         remove_silence=True,
-        speed=0.8,
+        speed=0.9,
         seed=None,
+        show_info=lambda *args, **kwargs: None,
+        progress=None
     )
 
 def play_voice(path: str):
