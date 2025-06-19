@@ -39,12 +39,12 @@ def to_hiragana(text: str) -> str:
 def contains_romaji(text: str) -> bool:
     return bool(re.search(r"[A-Za-z]", text))
 
-def generate_voice(text: str):
+def generate_voice(text: str, voice_output_path: str):
     f5tts.infer(
         ref_file=speaker_path,
         ref_text=ref_text,
         gen_text=text,
-        file_wave=output_path,
+        file_wave=voice_output_path,
         remove_silence=True,
         speed=0.8,
         seed=None,
