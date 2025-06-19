@@ -1,0 +1,65 @@
+# Use F5 TTS Engine
+'''
+For the Japanese checkpoint, 
+you need to create the config in ...\site-packages\f5_tts\configs:
+    1. Copy one of the configs inside the folder, 
+    2. and modify the fields to match the provided config, and name it "F5TTS_JA".
+'''
+
+from importlib.resources import files
+from f5_tts.api import F5TTS
+from cached_path import cached_path
+import pykakasi
+import re
+import simpleaudio as sa
+
+vocab_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/vocab_japanese.txt"))
+ckpt_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/model_21999120.pt"))
+ref_text_path = r"resources/ref_text.txt"
+speaker_path = r"resources/speaker.wav"
+output_path = r"resources/output.wav"
+
+with open(ref_text_path, "r", encoding="utf-8") as f:
+    ref_text = f.read()
+
+print(ref_text)
+
+f5tts = F5TTS(model="F5TTS_JA",
+              ckpt_file=ckpt_local_path,
+              vocab_file=vocab_local_path)
+
+def to_hiragana(text: str) -> str:
+    kks = pykakasi.kakasi()
+    kks.setMode("J", "H")  # Kanji to Hiragana
+    kks.setMode("K", "H")  # Katakana to Hiragana
+    kks.setMode("H", "H")  # Hiragana stays Hiragana
+    converter = kks.getConverter()
+    return converter.do(text)
+
+def contains_romaji(text: str) -> bool:
+    return bool(re.search(r"[A-Za-z]", text))
+
+def generate_voice(text: str):
+    f5tts.infer(
+        ref_file=speaker_path,
+        ref_text=ref_text,
+        gen_text=text,
+        file_wave=output_path,
+        remove_silence=True,
+        speed=0.8,
+        seed=None,
+    )
+
+def play_voice(path: str):
+    wave_obj = sa.WaveObject.from_wave_file(path)
+    play_obj = wave_obj.play()
+    play_obj.wait_done()
+
+#TTS
+if __name__ == "__main__":
+    while(True):
+        text = input("Your text : ")
+        #if contains_romaji(text) : continue
+
+        generate_voice(text)
+        play_voice(output_path)
