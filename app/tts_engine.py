@@ -28,14 +28,6 @@ f5tts = F5TTS(model="F5TTS_JA",
               ckpt_file=ckpt_local_path,
               vocab_file=vocab_local_path)
 
-def to_hiragana(text: str) -> str:
-    kks = pykakasi.kakasi()
-    kks.setMode("J", "H")  # Kanji to Hiragana
-    kks.setMode("K", "H")  # Katakana to Hiragana
-    kks.setMode("H", "H")  # Hiragana stays Hiragana
-    converter = kks.getConverter()
-    return converter.do(text)
-
 def contains_romaji(text: str) -> bool:
     return bool(re.search(r"[A-Za-z]", text))
 
