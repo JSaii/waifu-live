@@ -18,11 +18,12 @@ speaker_path = ""
 ref_text = ""
 
 def init_tts():
-    global f5tts, speaker_path, ref_text
+    global f5tts, speaker_path, ref_text, output_path
     vocab_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/vocab_japanese.txt"))
     ckpt_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/model_21999120.pt"))
     ref_text_path = r"resources/ref_text.txt"
     speaker_path = r"resources/speaker.wav"
+    output_path = r"resources/output.wav"
 
     with open(ref_text_path, "r", encoding="utf-8") as f:
         ref_text = f.read()
