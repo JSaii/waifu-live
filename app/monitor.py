@@ -1,5 +1,6 @@
 import pyautogui
 import openai_api
+import overlay
 import tts_engine
 import utils
 
@@ -22,6 +23,11 @@ messages = [{
     "content" : initial_prompt
 }]
 
+
+character = overlay.Overlay()
+character.show()
+character.set_state("idle")
+
 while True:
     captureScreen(screenshot_save_path)
     print("Screenshot captured...")
@@ -41,4 +47,6 @@ while True:
 
     response = utils.convert_to_hiragana(response)
     tts_engine.generate_voice(response, voice_output_path)
+    character.set_state("speaking")
     tts_engine.play_voice(voice_output_path)
+    character.set_state("idle")
