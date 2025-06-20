@@ -1,21 +1,16 @@
 import pyautogui
 import openai_api
-import overlay
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import QThread
-from PyQt5.QtCore import QTimer
-from PyQt5.QtCore import QMetaObject, Qt
-import tts_engine
 import utils
+from overlay import run_overlay
 import keyboard
-import sys
+from multiprocessing import Process, Queue
 import time
-import threading
 
 running = True
+
 def stop_loop():
     global running
-    print("Ctrl + Alt + Q pressed. Exiting loop.")
+    print("Ctrl+Alt+Q pressed — stopping loop.")
     running = False
 
 keyboard.add_hotkey("ctrl+alt+q", stop_loop)
@@ -39,53 +34,46 @@ messages = [{
     "content" : initial_prompt
 }]
 
-class LoopThread(QThread):
-    def run(self):
-        global running
-        while running:
-            captureScreen(screenshot_save_path)
-            print("Screenshot captured...")
+def monitor(queue: Queue):
+     while running:
+        captureScreen(screenshot_save_path)
+        print("Screenshot captured...")
+        img_message = openai_api.build_message(text="...", role="user", image_path=screenshot_save_path)
+        messages.append(img_message)
 
-            img_message = openai_api.build_message(text="...", role="user", image_path=screenshot_save_path)
-            messages.append(img_message)
+        print("Generating response...")
+        response = openai_api.get_response(messages)
+        response_message = openai_api.build_message(role="assistant", text=response)
 
-            print("Generating response...")
-            response = openai_api.get_response(messages)
-            response_message = openai_api.build_message(role="assistant", text=response)
+        messages.pop()
+        messages.append(openai_api.build_message(text="..., image:[Image removed to save api credits. Continue with available context.]"))
 
-            messages.pop()
-            messages.append(openai_api.build_message(text="..., image:[Image removed to save api credits. Continue with available context.]"))
-            messages.append(response_message)
+        messages.append(response_message)
 
-            print(f"Response: {response}")
+        print(f"Response: {response}")
 
-            response = utils.convert_to_hiragana(response)
-            tts_engine.generate_voice(response, voice_output_path)
+        response = utils.convert_to_hiragana(response)
 
-            def speak_and_animate():
-                QMetaObject.invokeMethod(character, "set_state", Qt.QueuedConnection, args=("speaking",))
-                tts_engine.play_voice(voice_output_path)
-                QMetaObject.invokeMethod(character, "set_state", Qt.QueuedConnection, args=("idle",))
+        tts_engine.generate_voice(response, voice_output_path)
 
-            # 🚀 Launch it in a separate thread
-            threading.Thread(target=speak_and_animate).start()
+        queue.put('speaking')
+        tts_engine.play_voice(voice_output_path)
+        queue.put('idle')
 
 
-            time.sleep(1)  # Optional: small delay to avoid hammering API
+if __name__ == "__main__":
+    import tts_engine
+    print(f"Initializing overlay...")
+    queue = Queue()
+    overlay_proc = Process(target=run_overlay, args=(queue,))
+    overlay_proc.start()
+    print(f"Initializing overlay...[Complete]")
 
-        print("Loop exited.")
-        character.close()
-        app.quit()  # Clean Qt exit
+    print(f"Initializing tts...")
+    tts_engine.init_tts()
+    print(f"Initializing tts...[Complete]")
+    print(f"Starting monitor...")
+    monitor(queue)
 
-# PyQt app setup
-app = QApplication(sys.argv)
-character = overlay.Overlay()
-character.show()
-character.set_state("idle")
-
-# Start threaded loop
-thread = LoopThread()
-thread.start()
-
-# Start GUI event loop
-sys.exit(app.exec())
+    overlay_proc.terminate()
+    overlay_proc.join()

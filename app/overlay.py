@@ -2,8 +2,8 @@ import sys
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGraphicsOpacityEffect
 from PyQt5.QtCore import Qt, QPropertyAnimation, QPoint
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import QTimer
-
+from PyQt5.QtCore import QTimer, QMetaObject, Q_ARG, pyqtSlot
+from multiprocessing import Process, Queue
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 def get_display_center(desktop):
@@ -56,6 +56,7 @@ class Overlay(QWidget):
 
         self.state = "idle"
 
+    @pyqtSlot(str)
     def set_state(self, new_state):
         if new_state == self.state:
             return
@@ -149,7 +150,30 @@ class Ui_MainWindow(object):
         self.button1.setText(_translate("MainWindow", "Up"))
         self.button2.setText(_translate("MainWindow", "Down"))
 
-    
+def run_overlay(queue: Queue):
+    app = QApplication(sys.argv)
+    character = Overlay()
+    character.show()
+    character.set_state("idle")
+
+    # Check for queue messages
+    def poll_queue():
+        while not queue.empty():
+            msg = queue.get()
+            print(f"[Overlay] received: {msg}")
+            QMetaObject.invokeMethod(
+                        character,
+                        "set_state",
+                        Qt.QueuedConnection,
+                        Q_ARG(str, msg)
+                    )
+
+    # Poll every 100ms
+    timer = QTimer()
+    timer.timeout.connect(poll_queue)
+    timer.start(100)
+
+    sys.exit(app.exec())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
