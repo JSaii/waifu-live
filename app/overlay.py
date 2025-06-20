@@ -11,7 +11,6 @@ def get_display_center(desktop):
     center_point = screen_geometry.center() # Get the center point
     return center_point
 
-# This class is vibe-coded
 class Overlay(QWidget):
     def __init__(self):
         super().__init__()
@@ -52,7 +51,7 @@ class Overlay(QWidget):
 
         # Initial size and position
         self.resize(self.images["idle"].size())
-        self.move(-45, 629)
+        self.move(-41, 629)
 
         self.state = "idle"
 
@@ -161,7 +160,7 @@ def run_overlay(queue: Queue):
     def poll_queue():
         while not queue.empty():
             msg = queue.get()
-            print(f"[Overlay] received: {msg}")
+            #print(f"[Overlay] received: {msg}")
             QMetaObject.invokeMethod(
                         character,
                         "set_state",

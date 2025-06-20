@@ -6,6 +6,7 @@ import keyboard
 from multiprocessing import Process, Queue
 import time
 import resources_paths
+import time_date_weather
 
 running = True
 
@@ -30,9 +31,23 @@ with open(initial_prompt_path, "r", encoding="utf-8") as f:
 
 voice_output_path = "resources/output.wav"
 
+# Get time and date, location, and today's weather.
+date_time = time_date_weather.get_datetime_with_day()
+weather = time_date_weather.get_weather()
+today_info = f"Currently it is {date_time}, {weather}"
+print(today_info)
+
 messages = [{
     "role" : "system",
     "content" : initial_prompt
+},
+{
+    "role":"system",
+    "content":"返答はみじかくしてください。「（てれて）」「（どきどき）」みたいな表現は使っちゃダメ。ふつうにしゃべってね。「〜」と「！」は、へんじのなかでぜったいに使わないでね。ローマ字はぜったいに使わないでください。"
+},
+{
+    "role":"system",
+    "content":today_info
 }]
 
 def monitor(queue: Queue):
@@ -57,9 +72,7 @@ def monitor(queue: Queue):
 
         tts_engine.generate_voice(response, voice_output_path)
 
-        queue.put('speaking')
-        tts_engine.play_voice(voice_output_path)
-        queue.put('idle')
+        utils.play_voice_with_feedback(voice_output_path, queue)
 
 
 if __name__ == "__main__":
