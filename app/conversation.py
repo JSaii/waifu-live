@@ -1,8 +1,9 @@
 import openai_api
 import tts_engine
+import resources_paths
 
 # Initial prompt
-initial_prompt_path = "resources/initialprompt.txt"
+initial_prompt_path = resources_paths.INITIAL_PROMPT_PATH
 with open(initial_prompt_path, "r", encoding="utf-8") as f:
     initial_prompt = f.read()
 

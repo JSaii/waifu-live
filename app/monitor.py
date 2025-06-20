@@ -5,6 +5,7 @@ from overlay import run_overlay
 import keyboard
 from multiprocessing import Process, Queue
 import time
+import resources_paths
 
 running = True
 
@@ -17,13 +18,13 @@ keyboard.add_hotkey("ctrl+alt+q", stop_loop)
 
 def captureScreen(path):
     screenshot = pyautogui.screenshot()
-    resized = screenshot.resize((854, 480))
+    resized = screenshot.resize((1280, 720))
     resized.save(path, format="JPEG", quality=85)
 
 screenshot_save_path = "resources/screenshot.jpg"
 
 # Initial prompt
-initial_prompt_path = "resources/monitor_initialprompt.txt"
+initial_prompt_path = resources_paths.MONITOR_INITIAL_PROMPT_PATH
 with open(initial_prompt_path, "r", encoding="utf-8") as f:
     initial_prompt = f.read()
 

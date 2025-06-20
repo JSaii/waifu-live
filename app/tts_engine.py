@@ -12,6 +12,7 @@ from cached_path import cached_path
 import pykakasi
 import re
 import simpleaudio as sa
+import resources_paths
 
 f5tts = None
 speaker_path = ""
@@ -21,8 +22,8 @@ def init_tts():
     global f5tts, speaker_path, ref_text, output_path
     vocab_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/vocab_japanese.txt"))
     ckpt_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/model_21999120.pt"))
-    ref_text_path = r"resources/ref_text.txt"
-    speaker_path = r"resources/speaker.wav"
+    ref_text_path = resources_paths.REF_TEXT_PATH
+    speaker_path = resources_paths.SPEAKER_PATH
     output_path = r"resources/output.wav"
 
     with open(ref_text_path, "r", encoding="utf-8") as f:
@@ -45,7 +46,7 @@ def generate_voice(text: str, voice_output_path: str):
         gen_text=text,
         file_wave=voice_output_path,
         remove_silence=True,
-        speed=0.9,
+        speed=0.75,
         seed=None,
         show_info=lambda *args, **kwargs: None,
         progress=None
@@ -58,6 +59,7 @@ def play_voice(path: str):
 
 #TTS
 if __name__ == "__main__":
+    init_tts()
     while(True):
         text = input("Your text : ")
         #if contains_romaji(text) : continue
