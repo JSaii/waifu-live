@@ -3,3 +3,5 @@ You need to have the following items in this folder:
 2. "ref_text.txt" --> The transcription of "speaker.wav"
 3. "monitor_initialprompt.txt" --> Initial prompt for ChatGPT
 4. "initialprompt.txt" --> If you want to run conversation.py
+5. "idle.png" --> Character image when idle
+6. "speaking.png" --> Character image when speaking
