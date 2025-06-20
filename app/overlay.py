@@ -20,6 +20,9 @@ class Overlay(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocus()
+
         # Load images
         self.images = {
             "idle": QPixmap("resources/idle.png"),
@@ -100,6 +103,16 @@ class Overlay(QWidget):
             self.move(event.globalPos() - self.drag_pos)
             event.accept()
 
+    def keyPressEvent(self, event):
+        modifiers = event.modifiers()
+        key = event.key()
+
+        if (modifiers & Qt.ControlModifier and
+            modifiers & Qt.AltModifier and
+            key == Qt.Key_Q):
+            self.close()
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -136,15 +149,17 @@ class Ui_MainWindow(object):
         self.button1.setText(_translate("MainWindow", "Up"))
         self.button2.setText(_translate("MainWindow", "Down"))
 
+    
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # overlay = Overlay()
-    # overlay.show()
-    print(get_display_center(app.desktop()))
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    overlay = Overlay()
+    overlay.show()
+    # print(get_display_center(app.desktop()))
+    # MainWindow = QtWidgets.QMainWindow()
+    # ui = Ui_MainWindow()
+    # ui.setupUi(MainWindow)
+    # MainWindow.show()
 
     # # 🔁 Example usage
     # from PyQt5.QtCore import QTimer
