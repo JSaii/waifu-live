@@ -52,7 +52,7 @@ class Overlay(QWidget):
 
         # Initial size and position
         self.resize(self.images["idle"].size())
-        self.move(0, 0)
+        self.move(-45, 629)
 
         self.state = "idle"
 
@@ -96,6 +96,7 @@ class Overlay(QWidget):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
+            print(self.pos())
             self.drag_pos = event.globalPos() - self.frameGeometry().topLeft()
             event.accept()
 
