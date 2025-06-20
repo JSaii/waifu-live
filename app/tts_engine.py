@@ -13,20 +13,26 @@ import pykakasi
 import re
 import simpleaudio as sa
 
-vocab_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/vocab_japanese.txt"))
-ckpt_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/model_21999120.pt"))
-ref_text_path = r"resources/ref_text.txt"
-speaker_path = r"resources/speaker.wav"
-output_path = r"resources/output.wav"
+f5tts = None
+speaker_path = ""
+ref_text = ""
 
-with open(ref_text_path, "r", encoding="utf-8") as f:
-    ref_text = f.read()
+def init_tts():
+    global f5tts, speaker_path, ref_text
+    vocab_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/vocab_japanese.txt"))
+    ckpt_local_path = str(cached_path("hf://Jmica/F5TTS/JA_21999120/model_21999120.pt"))
+    ref_text_path = r"resources/ref_text.txt"
+    speaker_path = r"resources/speaker.wav"
 
-print(ref_text)
+    with open(ref_text_path, "r", encoding="utf-8") as f:
+        ref_text = f.read()
 
-f5tts = F5TTS(model="F5TTS_JA",
-              ckpt_file=ckpt_local_path,
-              vocab_file=vocab_local_path)
+    print(ref_text)
+
+    f5tts = F5TTS(model="F5TTS_JA",
+                ckpt_file=ckpt_local_path,
+                vocab_file=vocab_local_path)
+
 
 def contains_romaji(text: str) -> bool:
     return bool(re.search(r"[A-Za-z]", text))
