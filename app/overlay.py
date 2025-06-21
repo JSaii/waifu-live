@@ -14,7 +14,6 @@ def get_display_center(desktop):
 class Overlay(QWidget):
     def __init__(self):
         super().__init__()
-
         # Frameless, transparent, always-on-top
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -52,6 +51,7 @@ class Overlay(QWidget):
         # Initial size and position
         self.resize(self.images["idle"].size())
         self.move(-41, 629)
+        self.base_pos = self.pos()
 
         self.state = "idle"
 
@@ -81,27 +81,34 @@ class Overlay(QWidget):
         self.anim_out = anim_out  # Keep references
         self.anim_in = anim_in
 
-        # Move up/down animation
-        current_pos = self.pos()
-        offset = QPoint(0, -20) if new_state == "speaking" else QPoint(0, 20)
+        # Move up/down animation based on fixed base_pos
+        target_pos = self.base_pos + (QPoint(0, -20) if new_state == "speaking" else QPoint(0, 0))
+
+        # Skip if already there
+        if self.pos() == target_pos:
+            return
 
         move_anim = QPropertyAnimation(self, b"pos")
         move_anim.setDuration(300)
-        move_anim.setStartValue(current_pos)
-        move_anim.setEndValue(current_pos + offset)
+        move_anim.setStartValue(self.pos())  # Animate from current spot
+        move_anim.setEndValue(target_pos)
         move_anim.start()
 
         self.move_anim = move_anim
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            print(self.pos())
             self.drag_pos = event.globalPos() - self.frameGeometry().topLeft()
             event.accept()
 
     def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.LeftButton:
+        if event.buttons() & Qt.LeftButton:
             self.move(event.globalPos() - self.drag_pos)
+            event.accept()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.base_pos = self.pos()  # Important for animation stability
             event.accept()
 
     def keyPressEvent(self, event):
@@ -179,15 +186,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     overlay = Overlay()
     overlay.show()
-    # print(get_display_center(app.desktop()))
-    # MainWindow = QtWidgets.QMainWindow()
-    # ui = Ui_MainWindow()
-    # ui.setupUi(MainWindow)
-    # MainWindow.show()
-
-    # # 🔁 Example usage
-    # from PyQt5.QtCore import QTimer
-    # QTimer.singleShot(1000, lambda: overlay.set_state("speaking"))
-    # QTimer.singleShot(3000, lambda: overlay.set_state("idle"))
 
     sys.exit(app.exec_())
