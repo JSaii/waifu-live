@@ -1,4 +1,4 @@
-# 🩷 WaifuLive
+# 🩷 WaifuLive - Your AI Desktop Companion. Always by your side.
 ⚠️ Currently not accepting PRs while the project is under heavy development. Stay tuned!
 
 ---
@@ -6,7 +6,7 @@
 ### Your one and only AI waifu companion — brought to life on your desktop.<br>
 <img src="https://i.imgur.com/I65NkGG.png" alt="Preview" width="400"/><br>
 <img src="https://i.imgur.com/sFZYe5z.jpeg" alt="Preview" width="400"/><br>
-Character design and art by me! Follow me on [Instagram](https://www.instagram.com/josephsaido/) for art and illlustrations !
+MirAI design and art by me! Follow me on [Instagram](https://www.instagram.com/josephsaido/) for art and illlustrations !
 
 > **Status:** 🚧 Under Development
 
