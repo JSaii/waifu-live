@@ -1,7 +1,7 @@
 # 🩷 waifu-live
 
 Your one and only AI waifu companion — brought to life on your desktop.<br>
-![MirAI](https://imgur.com/a/8t9AX3b)
+<img src="https://i.imgur.com/I65NkGG.png" alt="Preview" width="400"/>
 
 > **Status:** 🚧 Under Development
 
