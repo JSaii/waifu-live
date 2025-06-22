@@ -1,7 +1,8 @@
 # 🩷 waifu-live
 
 Your one and only AI waifu companion — brought to life on your desktop.<br>
-<img src="https://i.imgur.com/I65NkGG.png" alt="Preview" width="400"/>
+<img src="https://i.imgur.com/I65NkGG.png" alt="Preview" width="400"/><br>
+Character design and art by me! Follow me on [Instagram](https://www.instagram.com/josephsaido/) for art and illlustration
 
 > **Status:** 🚧 Under Development
 
@@ -35,7 +36,7 @@ Coming soon — setup instructions and requirements will be provided here.
 This project uses:
 - OpenAI GPT-4o for conversation
 - F5-TTS for voice
-- Python, PyQt, OpenCV, and TTS tools
+- Python, PyQt, OpenCV
 - MirAI Character Design by @josephsaido on Instagram (Follow Me!😊)
 
 ---
