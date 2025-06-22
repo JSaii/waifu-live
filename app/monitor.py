@@ -4,12 +4,16 @@ import utils
 from overlay import run_overlay
 from send_chat import run_chatbox
 import keyboard
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Event
 import time
 import resources_paths
 import time_date_weather
+import mss
+from PIL import Image
+from camera_monitor import run_camera
 
 running = True
+switch_to_camera = False
 
 def stop_loop():
     global running
@@ -18,10 +22,24 @@ def stop_loop():
 
 keyboard.add_hotkey("ctrl+alt+q", stop_loop)
 
-def captureScreen(path):
-    screenshot = pyautogui.screenshot()
-    resized = screenshot.resize((1280, 720))
-    resized.save(path, format="JPEG", quality=85)
+def get_image(path, camera_event = None, monitor_index=2):
+    if camera_event:
+        print("Snapping camera...")
+        camera_event.set()
+    else:
+        print("Taking a screenshot...")
+        with mss.mss() as sct:
+            # Get information about all monitors
+            monitors = sct.monitors  # [0] is all, [1] is first, etc.
+
+            if monitor_index >= len(monitors):
+                raise ValueError(f"Monitor index {monitor_index} out of range.")
+
+            monitor = monitors[monitor_index]
+            screenshot = sct.grab(monitor)
+            img = Image.frombytes("RGB", screenshot.size, screenshot.rgb)
+            resized = img.resize((1280, 720))
+            resized.save(path, format="JPEG", quality=85)
 
 screenshot_save_path = "resources/screenshot.jpg"
 
@@ -51,7 +69,7 @@ messages = [{
     "content":today_info
 }]
 
-def monitor(queue: Queue, send_chat_queue: Queue):
+def monitor(queue: Queue, send_chat_queue: Queue, camera_event = None):
      while running:
         is_chatting = False
         if not send_chat_queue.empty():
@@ -64,7 +82,7 @@ def monitor(queue: Queue, send_chat_queue: Queue):
             print("Empty queue")
         
         if not is_chatting:
-            captureScreen(screenshot_save_path)
+            get_image(screenshot_save_path, camera_event)
             print("Screenshot captured...")
             img_message = openai_api.build_message(text="...", role="user", image_path=screenshot_save_path)
             messages.append(img_message)
@@ -90,12 +108,24 @@ def monitor(queue: Queue, send_chat_queue: Queue):
 
 if __name__ == "__main__":
     import tts_engine
+    use_camera=True
+    if use_camera:
+        print(f"Initializing camera...")
+        ready_event = Event()
+        camera_event = Event()
+        camera_proc = Process(target=run_camera, args=(camera_event, ready_event))
+        camera_proc.start()
+        ready_event.wait()
+        print(f"Initializing camera...[Complete]")
+    else:
+        camera_event = None
+    
+    print(camera_event)
     print(f"Initializing overlay...")
     queue = Queue()
     overlay_proc = Process(target=run_overlay, args=(queue,))
     overlay_proc.start()
     print(f"Initializing overlay...[Complete]")
-
     print(f"Initializing send chatbox...")
     send_chat_queue = Queue()
     send_chat_proc = Process(target=run_chatbox, args=(send_chat_queue,))
@@ -106,7 +136,7 @@ if __name__ == "__main__":
     tts_engine.init_tts()
     print(f"Initializing tts...[Complete]")
     print(f"Starting monitor...")
-    monitor(queue, send_chat_queue)
+    monitor(queue, send_chat_queue, camera_event)
 
     overlay_proc.terminate()
     send_chat_proc.terminate()
