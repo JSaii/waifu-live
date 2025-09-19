@@ -4,6 +4,11 @@
 ---
 
 ### Your one and only AI waifu companion — brought to life on your desktop.<br>
+
+
+https://github.com/user-attachments/assets/f3d061db-c146-46c0-ad30-61647d0dceb4
+
+
 <img src="https://i.imgur.com/I65NkGG.png" alt="Preview" width="400"/><br>
 <img src="https://i.imgur.com/sFZYe5z.jpeg" alt="Preview" width="400"/><br>
 MirAI design and art by me! Follow me on [Instagram](https://www.instagram.com/josephsaido/) for art and illlustrations !
